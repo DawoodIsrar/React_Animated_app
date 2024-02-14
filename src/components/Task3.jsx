@@ -1,70 +1,104 @@
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, easeInOut, easeOut } from "framer-motion";
 import { IoSend } from "react-icons/io5";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import man from "../assets/man.jpg";
 import { FaSearch } from "react-icons/fa";
-// import Taskrecieved from "./Task2";
-// import { UserContext } from "./Chat";
 import TypingAnimation from "./typingAnimation";
 import { useTypingContext } from "../Context/TypingContextProvider";
-
-const rightDiv = {
+const leftDiv = {
   hidden: {
-    opacity: 0,
-    y: "+1vw",
+    opacity: 1,
+    x: -100,
+    y: +50,
     scale: 1,
+    rotate: 90,
   },
   show: {
-    opacity: 1.5,
+    opacity: 1,
+    x: 0,
     y: 0,
     transition: {
       type: "spring",
-      duration: 0.3,
-      //   damping: 100,
+      duration: 0.5,
+      when: "beforeChildren",
+    },
+    rotate: 0,
+  },
+};
+const rightDiv = {
+  hidden: {
+    opacity: 0,
+    x: +100,
+    y: -50,
+    scale: 1,
+    rotate: 90,
+  },
+  show: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      type: "spring",
+      duration: 0.5,
+      when: "beforeChildren",
+    },
+
+    rotate: 0,
+  },
+};
+const TextAni = {
+  hidden: {
+    opacity: 0,
+    y: "-1vw",
+    scale: 1,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      duration: 1,
       when: "afterChildren",
     },
   },
 };
-
+const TypingDiv = {
+  hidden: {
+    opacity: 0,
+    x: 0,
+    y: +50,
+    scale: 1,
+    rotate: 90,
+  },
+  show: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      type: "spring",
+      duration: 0.5,
+      when: "beforeChildren",
+    },
+    rotate: 0,
+  },
+};
 const Personone = ({ setMessages, messages }) => {
   const { setUserTwoTyping } = useTypingContext();
   const { userOneTyping } = useTypingContext();
-  //   const [text, setText] = useState([]);
-  //   const { isTyping } = props;
-  //   const typing = isTyping?.isTyping;
-  //   const user = isTyping?.user;
-  //   const { isTyping, setIsTyping } = useContext(UserContext);
 
-  const [clickedIndex, setClickedIndex] = useState(null); // Track clicked message index
+  const [clickedIndex, setClickedIndex] = useState(null);
   const containerRef = useRef(null);
   const inputRef = useRef(null);
-  console.log("props messages", messages);
-  //   const [input, setInput] = useState("");
   let typingTimer;
-  const handleChange = () => {
-    // setInput(e.target.value);
-    // handleTyping({
-    //   userOne: false,
-    //   userTwo: true,
-    // });
-    setUserTwoTyping(true);
-    clearTimeout(typingTimer);
 
+  const handleChange = () => {
+    setUserTwoTyping(true);
+
+    clearTimeout(typingTimer);
     typingTimer = setTimeout(() => {
       setUserTwoTyping(false);
-    }, 2000);
-    // handleTyping({
-    //   userOne: true,
-    //   userTwo: false,
-    // });
-    // clearTimeout(typingTimer);
-    // typingTimer = setTimeout(() => {
-    //   handleTyping({
-    //     isTyping: false,
-    //     user: "",
-    //   });
-    // }, 2000); // Notify the parent component that typing has started
+    }, 5000);
   };
 
   useEffect(() => {
@@ -78,6 +112,7 @@ const Personone = ({ setMessages, messages }) => {
   }, [messages]);
 
   const handleSend = (e) => {
+    setUserTwoTyping(false);
     e.preventDefault();
     const inputValue = e.target.inputField.value.trim();
     if (inputValue) {
@@ -87,12 +122,9 @@ const Personone = ({ setMessages, messages }) => {
         user: "dawood",
       };
       setMessages(newItem);
-      //   setText((prevText) => [...prevText, newItem]);
       e.target.inputField.value = "";
-      //   setInput("");
     }
   };
-  //   handleTyping();
 
   const getCurrentTime = () => {
     const currentTime = new Date();
@@ -100,13 +132,16 @@ const Personone = ({ setMessages, messages }) => {
     const minutes = currentTime.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
   };
+  const [showDiv, setShowDiv] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowDiv(false);
+    }, 3000);
+  });
 
   const showTime = (index) => {
     setClickedIndex(index === clickedIndex ? null : index);
   };
-  //   useEffect(() => {
-  //     console.log("typing here in dawood comp", typing);
-  //   });
 
   return (
     <div
@@ -130,8 +165,6 @@ const Personone = ({ setMessages, messages }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          //   padding: "10px",
-          //   paddingInline: "20px",
         }}
       >
         <div>
@@ -174,114 +207,24 @@ const Personone = ({ setMessages, messages }) => {
           width: "80vh",
           padding: "10px",
           overflowY: "scroll",
-          height: "300px", // Set the height of the container
+          height: "300px",
         }}
         ref={containerRef}
       >
         <motion.div>
           <AnimatePresence>
-            {messages?.map((item, index) => (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: item.user === "dawood" ? "end" : "start",
-                }}
-                key={item.id}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    marginBottom: "5px",
-                    alignItems: "end",
-                  }}
-                >
-                  <motion.div
-                    initial={rightDiv.hidden}
-                    animate={rightDiv.show}
-                    exit={rightDiv.hidden}
-                    custom={index}
-                    variants={rightDiv}
-                    className="text-container"
-                    style={{
-                      padding: "10px",
-                      minWidth: "30px",
-                      width: "100%",
-                      maxWidth: "fit-content",
-                      overflowX: "hidden",
-                      justifySelf: "end",
-                      /* min-height: 50px; */
-                      display: "flex",
-                      flexWrap: "wrap",
-                      justifyContent: "start",
-                      alignItems: "start",
-                      //   borderRadius: "12px",
-                      backgroundColor:
-                        item.user === "dawood" ? "#208CFF" : "lightgreen",
-                      borderRadius:
-                        item.user === "dawood"
-                          ? "15px 15px 0 15px"
-                          : "15px 15px 15px 0",
-                      fontSize: "small",
-                      color: "white",
-                      marginBottom: "20px",
-                      whiteSpace: "normal",
-                    }}
-                    onClick={() => showTime(index)} // Change here
-                    transition={{
-                      delay: index * 0.1,
-                      duration: 1,
-                    }}
-                  >
-                    <div className="content">{item.text}</div>
-                  </motion.div>
-                  {clickedIndex === index && ( // Change here
-                    <div
-                      style={{
-                        textAlign: "right",
-                        fontSize: "12px",
-                        color: "gray",
-                      }}
-                    >
-                      Delivery Time: {getCurrentTime()}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-        {userOneTyping && (
-          <>
-            <motion.div
-              initial={rightDiv.hidden}
-              animate={rightDiv.show}
-              exit={rightDiv.hidden}
-              style={{
-                width: "100%",
-                display: "flex",
-                backgroundColor: "",
-                //   gap: "5px",
-                //   width: "auto",
-                //   backgroundColor: "lightblue",
-                justifyContent: "start",
-                alignItems: "end",
-              }}
-            >
+            {showDiv && (
               <div
                 style={{
                   padding: "10px",
                   minWidth: "30px",
-                  width: "100%",
+                  width: "80vh",
                   maxWidth: "fit-content",
                   overflowX: "hidden",
-                  //   justifySelf: "start",
-                  /* min-height: 50px; */
                   display: "flex",
                   flexWrap: "wrap",
                   justifyContent: "start",
                   alignItems: "start",
-                  //   borderRadius: "12px",
                   backgroundColor: "lightgreen",
                   borderRadius: "15px 15px 15px 0",
                   fontSize: "small",
@@ -293,11 +236,137 @@ const Personone = ({ setMessages, messages }) => {
               >
                 <TypingAnimation />
               </div>
-            </motion.div>
-          </>
-        )}
+            )}
+            {!showDiv &&
+              messages?.map((item, index) => (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: item.user === "dawood" ? "end" : "start",
+                  }}
+                  key={item.id}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      marginBottom: "5px",
+                      alignItems: "end",
+                    }}
+                  >
+                    <motion.div
+                      initial={
+                        item.user === "dawood"
+                          ? rightDiv.hidden
+                          : leftDiv.hidden
+                      }
+                      animate={
+                        item.user === "dawood" ? rightDiv.show : leftDiv.show
+                      }
+                      exit={
+                        item.user === "dawood"
+                          ? rightDiv.hidden
+                          : leftDiv.hidden
+                      }
+                      custom={index}
+                      variants={rightDiv}
+                      className="text-container"
+                      style={{
+                        padding: "10px",
+                        minWidth: "30px",
+                        width: "100%",
+                        maxWidth: "fit-content",
+                        overflowX: "hidden",
+                        justifySelf: "end",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "start",
+                        alignItems: "start",
+                        backgroundColor:
+                          item.user === "dawood" ? "#208CFF" : "lightgreen",
+                        borderRadius:
+                          item.user === "dawood"
+                            ? "15px 15px 0 15px"
+                            : "15px 15px 15px 0",
+                        fontSize: "small",
+                        color: "white",
+                        marginBottom: "20px",
+                        whiteSpace: "normal",
+                      }}
+                      onClick={() => showTime(index)}
+                      transition={{
+                        delay: index * 0.1,
+                        duration: 1,
+                      }}
+                    >
+                      <motion.div
+                        initial={TextAni.hidden}
+                        animate={TextAni.show}
+                        variants={TextAni}
+                        className="content"
+                      >
+                        {item.text}
+                      </motion.div>
+                    </motion.div>
+                    {clickedIndex === index && (
+                      <div
+                        style={{
+                          textAlign: "right",
+                          fontSize: "12px",
+                          color: "gray",
+                        }}
+                      >
+                        Delivery Time: {getCurrentTime()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
-
+      {userOneTyping && (
+        <>
+          <motion.div
+            initial={TypingDiv.hidden}
+            animate={TypingDiv.show}
+            exit={TypingDiv.hidden}
+            variants={TypingDiv}
+            style={{
+              alignSelf: "start",
+              display: "flex",
+              backgroundColor: "",
+              justifyContent: "start",
+              alignItems: "start",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px",
+                minWidth: "30px",
+                marginLeft: "32px",
+                width: "100%",
+                maxWidth: "fit-content",
+                overflowX: "hidden",
+                justifySelf: "end",
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "start",
+                alignItems: "start",
+                backgroundColor: "lightgreen",
+                borderRadius: "15px 15px 15px 0",
+                fontSize: "small",
+                color: "black",
+                marginBottom: "20px",
+                height: "20px",
+                whiteSpace: "normal",
+              }}
+            >
+              <TypingAnimation />
+            </div>
+          </motion.div>
+        </>
+      )}
       <div style={{ width: "100%" }}>
         <form
           style={{

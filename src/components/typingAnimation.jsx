@@ -3,8 +3,8 @@ import React from "react";
 
 const LoadingDot = {
   display: "block",
-  width: "1rem",
-  height: "1rem",
+  width: "10px",
+  height: "10px",
   backgroundColor: "white",
   borderRadius: "50%",
 };
@@ -15,6 +15,7 @@ const LoadingContainer = {
 
   display: "flex",
   width: "100%",
+  height: "100%",
   gap: "10px",
   justifyContent: "space-around",
 };
@@ -34,17 +35,18 @@ const ContainerVariants = {
 
 const DotVariants = {
   initial: {
-    y: "5%",
+    y: "0%",
   },
   animate: {
-    y: "40%",
+    y: ["0%", "40%", "0%"],
   },
 };
 
 const DotTransition = {
-  duration: 0.5,
-  yoyo: Infinity,
-  //   ease: "easeInOut",
+  duration: 1,
+  repeat: Infinity, // Repeat the animation indefinitely
+  repeatType: "reverse",
+  ease: "easeInOut",
 };
 
 export default function TypingAnimation() {

@@ -6,24 +6,83 @@ import man from "../assets/man.jpg";
 import { FaSearch } from "react-icons/fa";
 import { useTypingContext } from "../Context/TypingContextProvider";
 import TypingAnimation from "./typingAnimation";
-
-const rightDiv = {
+const leftDiv = {
   hidden: {
-    opacity: 0,
-    y: "+1vw",
+    opacity: 1,
+    x: -100,
+    y: +50,
     scale: 1,
+    rotate: 90,
   },
   show: {
-    opacity: 1.5,
+    opacity: 1,
+    x: 0,
     y: 0,
     transition: {
       type: "spring",
-      duration: 0.3,
+      duration: 0.5,
+      when: "beforeChildren",
+    },
+    rotate: 0,
+  },
+};
+const rightDiv = {
+  hidden: {
+    opacity: 0,
+    x: +100,
+    y: -50,
+    scale: 1,
+    rotate: 90,
+  },
+  show: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      type: "spring",
+      duration: 0.5,
+      when: "beforeChildren",
+    },
+
+    rotate: 0,
+  },
+};
+const TextAni = {
+  hidden: {
+    opacity: 0,
+    y: "-1vw",
+    scale: 1,
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: "spring",
+      duration: 1,
       when: "afterChildren",
     },
   },
 };
-
+const TypingDiv = {
+  hidden: {
+    opacity: 0,
+    x: 0,
+    y: +50,
+    scale: 1,
+    rotate: 90,
+  },
+  show: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: {
+      type: "spring",
+      duration: 0.5,
+      when: "beforeChildren",
+    },
+    rotate: 0,
+  },
+};
 const Personone = ({ setMessages, messages }) => {
   const { setUserOneTyping } = useTypingContext();
   const { userTwoTyping } = useTypingContext();
@@ -32,17 +91,13 @@ const Personone = ({ setMessages, messages }) => {
   const inputRef = useRef(null);
   let typingTimer;
 
-  const [input, setInput] = useState("");
-
-  const handleChange = (e) => {
-    setInput(e.target.value);
-
+  const handleChange = () => {
     setUserOneTyping(true);
 
     clearTimeout(typingTimer);
     typingTimer = setTimeout(() => {
       setUserOneTyping(false);
-    }, 2000);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -55,6 +110,8 @@ const Personone = ({ setMessages, messages }) => {
 
   const handleSend = (e) => {
     e.preventDefault();
+    setUserOneTyping(false);
+
     const inputValue = e.target.inputField.value.trim();
     if (inputValue) {
       const newItem = {
@@ -63,7 +120,6 @@ const Personone = ({ setMessages, messages }) => {
         user: "haris",
       };
       setMessages(newItem);
-      //   setText((prevText) => [...prevText, newItem]);
       e.target.inputField.value = "";
       setInput("");
     }
@@ -79,6 +135,12 @@ const Personone = ({ setMessages, messages }) => {
   const showTime = (index) => {
     setClickedIndex(index === clickedIndex ? null : index);
   };
+  const [showDiv, setShowDiv] = useState(true);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowDiv(false);
+    }, 3000);
+  });
 
   return (
     <div
@@ -102,8 +164,6 @@ const Personone = ({ setMessages, messages }) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          //   padding: "10px",
-          //   paddingInline: "20px",
         }}
       >
         <div>
@@ -153,89 +213,7 @@ const Personone = ({ setMessages, messages }) => {
       >
         <motion.div>
           <AnimatePresence>
-            {messages?.map((item, index) => (
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: item.user === "haris" ? "end" : "start",
-                }}
-                key={item.id}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    marginBottom: "5px",
-                    alignItems: "end",
-                  }}
-                >
-                  <motion.div
-                    initial={rightDiv.hidden}
-                    animate={rightDiv.show}
-                    exit={rightDiv.hidden}
-                    custom={index}
-                    variants={rightDiv}
-                    className="text-container"
-                    style={{
-                      padding: "10px",
-                      minWidth: "30px",
-                      width: "100%",
-                      maxWidth: "fit-content",
-                      overflowX: "hidden",
-                      justifySelf: "end",
-                      display: "flex",
-                      flexWrap: "wrap",
-                      justifyContent: "start",
-                      alignItems: "start",
-                      backgroundColor:
-                        item.user === "haris" ? "#208CFF" : "lightgreen",
-                      borderRadius:
-                        item.user === "haris"
-                          ? "15px 15px 0 15px"
-                          : "15px 15px 15px 0 ",
-                      fontSize: "small",
-                      color: "white",
-                      marginBottom: "20px",
-                      whiteSpace: "normal",
-                    }}
-                    onClick={() => showTime(index)}
-                    transition={{
-                      delay: index * 0.1,
-                      duration: 1,
-                    }}
-                  >
-                    <div className="content">{item.text}</div>
-                  </motion.div>
-                  {clickedIndex === index && (
-                    <div
-                      style={{
-                        textAlign: "right",
-                        fontSize: "12px",
-                        color: "gray",
-                      }}
-                    >
-                      Delivery Time: {getCurrentTime()}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-        {userTwoTyping && (
-          <>
-            <motion.div
-              initial={rightDiv.hidden}
-              animate={rightDiv.show}
-              exit={rightDiv.hidden}
-              style={{
-                width: "100%",
-                display: "flex",
-                backgroundColor: "",
-                justifyContent: "start",
-                alignItems: "start",
-              }}
-            >
+            {showDiv && (
               <div
                 style={{
                   padding: "10px",
@@ -243,7 +221,6 @@ const Personone = ({ setMessages, messages }) => {
                   width: "100%",
                   maxWidth: "fit-content",
                   overflowX: "hidden",
-                  justifySelf: "end",
                   display: "flex",
                   flexWrap: "wrap",
                   justifyContent: "start",
@@ -253,17 +230,139 @@ const Personone = ({ setMessages, messages }) => {
                   fontSize: "small",
                   color: "black",
                   marginBottom: "20px",
-                  height: "20px",
                   whiteSpace: "normal",
+                  height: "20px",
                 }}
               >
                 <TypingAnimation />
               </div>
-            </motion.div>
-          </>
-        )}
+            )}
+            {!showDiv &&
+              messages?.map((item, index) => (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: item.user === "haris" ? "end" : "start",
+                  }}
+                  key={item.id}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      marginBottom: "5px",
+                      alignItems: "end",
+                    }}
+                  >
+                    <motion.div
+                      initial={
+                        item.user === "haris" ? rightDiv.hidden : leftDiv.hidden
+                      }
+                      animate={
+                        item.user === "haris" ? rightDiv.show : leftDiv.show
+                      }
+                      exit={
+                        item.user === "haris" ? rightDiv.hidden : leftDiv.hidden
+                      }
+                      custom={index}
+                      variants={rightDiv}
+                      className="text-container"
+                      style={{
+                        padding: "10px",
+                        minWidth: "30px",
+                        width: "100%",
+                        maxWidth: "fit-content",
+                        overflowX: "hidden",
+                        justifySelf: "end",
+                        display: "flex",
+                        flexWrap: "wrap",
+                        justifyContent: "start",
+                        alignItems: "start",
+                        backgroundColor:
+                          item.user === "haris" ? "#208CFF" : "lightgreen",
+                        borderRadius:
+                          item.user === "haris"
+                            ? "15px 15px 0 15px"
+                            : "15px 15px 15px 0 ",
+                        fontSize: "small",
+                        color: "white",
+                        marginBottom: "20px",
+                        whiteSpace: "normal",
+                      }}
+                      onClick={() => showTime(index)}
+                      transition={{
+                        delay: index * 0.1,
+                        duration: 1,
+                      }}
+                    >
+                      <motion.div
+                        initial={TextAni.hidden}
+                        animate={TextAni.show}
+                        variants={TextAni}
+                        className="content"
+                      >
+                        {item.text}
+                      </motion.div>
+                    </motion.div>
+                    {clickedIndex === index && (
+                      <div
+                        style={{
+                          textAlign: "right",
+                          fontSize: "12px",
+                          color: "gray",
+                        }}
+                      >
+                        Delivery Time: {getCurrentTime()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
-
+      {userTwoTyping && (
+        <>
+          <motion.div
+            initial={TypingDiv.hidden}
+            animate={TypingDiv.show}
+            exit={TypingDiv.hidden}
+            variants={TypingDiv}
+            style={{
+              alignSelf: "start",
+              display: "flex",
+              backgroundColor: "",
+              justifyContent: "start",
+              alignItems: "start",
+            }}
+          >
+            <div
+              style={{
+                padding: "10px",
+                minWidth: "30px",
+                marginLeft: "32px",
+                width: "100%",
+                maxWidth: "fit-content",
+                overflowX: "hidden",
+                justifySelf: "end",
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "start",
+                alignItems: "start",
+                backgroundColor: "lightgreen",
+                borderRadius: "15px 15px 15px 0",
+                fontSize: "small",
+                color: "black",
+                marginBottom: "20px",
+                height: "20px",
+                whiteSpace: "normal",
+              }}
+            >
+              <TypingAnimation />
+            </div>
+          </motion.div>
+        </>
+      )}
       <div style={{ width: "100%", padding: "10px" }}>
         <form
           style={{
